@@ -7,7 +7,6 @@ import com.wefood.back.product.dto.UploadImageRequestDto;
 import com.wefood.back.global.image.service.StorageService;
 import com.wefood.back.product.dto.ProductDetailResponse;
 import com.wefood.back.product.dto.ProductResponse;
-import com.wefood.back.product.dto.UploadImageRequestDto;
 import com.wefood.back.product.service.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -89,7 +88,7 @@ public class ProductController {
     }
 
     @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping
+    @PostMapping()
     public void uploadImages(
         @Valid @ModelAttribute UploadImageRequestDto requestDto,
         BindingResult result) {

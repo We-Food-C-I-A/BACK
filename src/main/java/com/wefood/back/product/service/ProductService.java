@@ -1,13 +1,25 @@
 package com.wefood.back.product.service;
 
+import com.wefood.back.farm.entity.Farm;
+import com.wefood.back.farm.repository.FarmRepository;
 import com.wefood.back.global.image.repository.ProductImageRepository;
+import com.wefood.back.product.dto.CreateProductRequestDto;
 import com.wefood.back.product.dto.ProductDetailResponse;
 import com.wefood.back.product.dto.ProductImageDetailResponse;
 import com.wefood.back.product.dto.ProductResponse;
+import com.wefood.back.product.entity.Category;
+import com.wefood.back.product.entity.Product;
+import com.wefood.back.product.entity.ProductCategory;
+import com.wefood.back.product.entity.ProductTag;
+import com.wefood.back.product.entity.Tag;
 import com.wefood.back.product.exception.CategoryNotFoundException;
 import com.wefood.back.product.exception.ProductNotFoundException;
 import com.wefood.back.product.repository.CategoryRepository;
+import com.wefood.back.product.repository.ProductCategoryRepository;
 import com.wefood.back.product.repository.ProductRepository;
+import com.wefood.back.product.repository.ProductTagRepository;
+import com.wefood.back.product.repository.TagRepository;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,6 +27,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class ProductService {
@@ -25,14 +38,29 @@ public class ProductService {
     private String bucketName;
 
     private final ProductRepository productRepository;
+
     private final ProductImageRepository productImageRepository;
+
     private final CategoryRepository categoryRepository;
 
+    private final ProductCategoryRepository productCategoryRepository;
 
-    public ProductService(ProductRepository productRepository, ProductImageRepository productImageRepository, CategoryRepository categoryRepository) {
+    private final FarmRepository farmRepository;
+
+    private final TagRepository tagRepository;
+
+    private final ProductTagRepository productTagRepository;
+
+    public ProductService(ProductRepository productRepository, ProductImageRepository productImageRepository, CategoryRepository categoryRepository,
+        ProductCategoryRepository productCategoryRepository, FarmRepository farmRepository,
+        TagRepository tagRepository, ProductTagRepository productTagRepository) {
         this.productRepository = productRepository;
         this.productImageRepository = productImageRepository;
         this.categoryRepository = categoryRepository;
+        this.productCategoryRepository = productCategoryRepository;
+        this.farmRepository = farmRepository;
+        this.tagRepository = tagRepository;
+        this.productTagRepository = productTagRepository;
     }
 
     /**
@@ -103,5 +131,51 @@ public class ProductService {
         }
 
         return products;
+    }
+
+    @Transactional
+    public void setProduct(Long farmId,CreateProductRequestDto createProductRequestDto){
+        Farm farm = farmRepository.findById(farmId)
+            .orElseThrow(() -> new IllegalArgumentException("Farm not found with id: " + farmId));
+
+        Category category = categoryRepository.findById(createProductRequestDto.getCategoryId())
+            .orElseThrow(() -> new IllegalArgumentException("Category not found with id: " + farmId));
+
+        List<Tag> tags = createProductRequestDto.getTags().stream()
+            .map(this::getOrCreateTag)
+            .collect(Collectors.toList());
+
+        Product product = Product.builder().farm(farm).name("["+farm.getName()+"] "+createProductRequestDto.getName()).detail(createProductRequestDto.getDetail()).price(
+            createProductRequestDto.getPrice()).build();
+
+        Product newProduct = productRepository.save(product);
+
+        ProductCategory productCategory = ProductCategory.builder().pk(ProductCategory.Pk.builder().productId(newProduct.getId()).categoryId(
+            category.getId()).build()).build();
+
+        List<ProductTag> productTags = tags.stream()
+            .map(tag -> createProductTag(newProduct.getId(), tag.getId()))
+            .collect(Collectors.toList());
+
+        productTagRepository.saveAll(productTags);
+
+        productCategoryRepository.save(productCategory);
+
+    }
+
+    private Tag getOrCreateTag(String tagName) {
+        // Optional<Tag>를 반환하는 findByName 메서드 호출
+        Optional<Tag> optionalTag = tagRepository.findByName(tagName);
+
+        // Optional의 orElseGet 메서드를 사용하여 태그가 없으면 새로 생성
+        return optionalTag.orElseGet(() -> {
+            Tag newTag = Tag.builder().name(tagName).build();
+            return tagRepository.save(newTag);
+        });
+    }
+
+    private ProductTag createProductTag(Long productId, Long tagId) {
+        ProductTag productTag = ProductTag.builder().pk(ProductTag.Pk.builder().productId(productId).tagId(tagId).build()).build();
+        return productTag;
     }
 }
