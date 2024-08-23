@@ -11,7 +11,9 @@ import com.wefood.back.global.exception.InvalidRequestException;
 import com.wefood.back.global.image.dto.UploadImageRequestDto;
 import com.wefood.back.global.image.dto.UploadThumbnailRequestDto;
 import com.wefood.back.global.image.service.StorageService;
+import com.wefood.back.product.dto.CreateProductRequest;
 import com.wefood.back.product.dto.ProductResponse;
+import com.wefood.back.product.service.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -39,6 +41,7 @@ public class FarmController {
 
     private final FarmService farmService;
     private final StorageService storageService;
+    private final ProductService productService;
     private final static String DIR_NAME = "farm";
 
     @ResponseStatus(HttpStatus.CREATED)
@@ -121,5 +124,16 @@ public class FarmController {
         Page<ProductResponse> products = farmService.getProductsByFarm(farmId, pageable);
         Message<Page<ProductResponse>> message = new Message<>(200, "상품 조회 성공", products);
         return new ResponseEntity<>(message, HttpStatus.OK);
+    }
+
+    @PostMapping("/{farmId}/product")
+    @ResponseStatus(HttpStatus.CREATED)
+    public void setProduct(@PathVariable(name = "farmId") Long farmId,
+        @Valid @RequestBody CreateProductRequest createProductRequest,
+        BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            throw new InvalidRequestException(bindingResult);
+        }
+        productService.create(farmId, createProductRequest);
     }
 }
