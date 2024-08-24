@@ -70,21 +70,21 @@ public class FarmController {
 //        }
 //    }
 
-    @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping("/thumbnail")
-    public void uploadThumbnail(
-            @Valid @ModelAttribute UploadThumbnailRequestDto requestDto,
-            BindingResult result) {
-        if (result.hasErrors()) {
-            throw new InvalidRequestException(result);
-        }
-
-        try {
-            storageService.saveThumbnail(requestDto, DIR_NAME);
-        } catch (IOException e) {
-            throw new FileUploadException("An error occurred while uploading files.", e);
-        }
-    }
+//    @ResponseStatus(HttpStatus.CREATED)
+//    @PostMapping("/thumbnail")
+//    public void uploadThumbnail(
+//            @Valid @ModelAttribute UploadThumbnailRequestDto requestDto,
+//            BindingResult result) {
+//        if (result.hasErrors()) {
+//            throw new InvalidRequestException(result);
+//        }
+//
+//        try {
+//            storageService.saveThumbnail(requestDto, DIR_NAME);
+//        } catch (IOException e) {
+//            throw new FileUploadException("An error occurred while uploading files.", e);
+//        }
+//    }
 
     @ResponseStatus(HttpStatus.OK)
     @PostMapping("/create")
