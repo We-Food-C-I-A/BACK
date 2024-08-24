@@ -18,5 +18,5 @@ import org.springframework.web.multipart.MultipartFile;
 public interface StorageService {
     void saveImages(Long id, List<MultipartFile> multipartFiles, String dirName) throws IOException;
 
-    void saveThumbnail(UploadThumbnailRequestDto uploadThumbnail, String dirName) throws IOException;
+    void saveThumbnail(Long id, MultipartFile multipartFile, String dirName) throws IOException;
 }
