@@ -75,14 +75,14 @@ public class S3Service implements StorageService {
     }
 
     @Override
-    public void saveThumbnail(UploadThumbnailRequestDto uploadThumbnailRequestDto, String dirName)
+    public void saveThumbnail(Long id, MultipartFile multipartFile, String dirName)
         throws IOException {
-        Long id = uploadThumbnailRequestDto.getId();
-        ImageRootType rootType= dbCheckRootType(dirName, uploadThumbnailRequestDto.getId());
-            File uploadFile = convert(uploadThumbnailRequestDto.getFiles())  // 파일 변환할 수 없으면 에러
+        ImageRootType rootType= dbCheckRootType(dirName, id);
+            File uploadFile = convert(multipartFile)  // 파일 변환할 수 없으면 에러
                 .orElseThrow(() -> new IllegalArgumentException("error: MultipartFile -> File convert fail"));
         String imageUrl = upload(uploadFile, dirName, id);
         String extension = getFileExtension(imageUrl);
+        System.out.println(imageUrl+" "+extension);
         Image image = Image.builder().name(imageUrl).extension(extension).build();
         imageRepository.save(image);
         saveThumbnailTypeRepo(rootType,image);

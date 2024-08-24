@@ -107,12 +107,10 @@ public class ProductController {
     @PostMapping("/thumbnail")
     public void uploadThumbnail(@RequestParam("id") Long id,
         @RequestParam("files") MultipartFile files) {
-        UploadThumbnailRequestDto requestDto = new UploadThumbnailRequestDto();
-        requestDto.setId(id);
-        requestDto.setFiles(files);
-
+        System.out.println(id);
+        System.out.println(files.getOriginalFilename());
         try {
-            storageService.saveThumbnail(requestDto, DIR_NAME);
+            storageService.saveThumbnail(id,files, DIR_NAME);
         } catch (IOException e) {
             throw new FileUploadException("An error occurred while uploading files.", e);
         }
