@@ -91,7 +91,7 @@ public class ProductController {
     }
 
     @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping
     public void uploadImages(
         @RequestParam("id") Long id,
         @RequestParam("files") List<MultipartFile> files) {
