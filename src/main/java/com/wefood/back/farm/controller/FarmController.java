@@ -57,18 +57,18 @@ public class FarmController {
             throw new FileUploadException("An error occurred while uploading files.", e);
         }
     }
-//    @ResponseStatus(HttpStatus.CREATED)
-//    @PostMapping("/upload-part")
-//    public void uploadImages(
-//            @RequestPart("files") MultipartFile[] files, @RequestParam("id") Long id) {
-//
-//        UploadImageRequestDto uploadImageRequestDto = new UploadImageRequestDto(Arrays.stream(files).toList(), id);
-//        try {
-//            storageService.saveImages(uploadImageRequestDto, DIR_NAME);
-//        } catch (IOException e) {
-//            throw new FileUploadException("An error occurred while uploading files.", e);
-//        }
-//    }
+    @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping("/upload-part")
+    public void uploadImages(
+            @RequestPart("files") MultipartFile[] files, @RequestParam("id") Long id) {
+
+        UploadImageRequestDto uploadImageRequestDto = new UploadImageRequestDto(Arrays.stream(files).toList(), id);
+        try {
+            storageService.saveImages(id, List.of(files), DIR_NAME);
+        } catch (IOException e) {
+            throw new FileUploadException("An error occurred while uploading files.", e);
+        }
+    }
 
 //    @ResponseStatus(HttpStatus.CREATED)
 //    @PostMapping("/thumbnail")
