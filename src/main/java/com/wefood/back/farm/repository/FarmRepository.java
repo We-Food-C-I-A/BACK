@@ -20,7 +20,7 @@ public interface FarmRepository extends JpaRepository<Farm, Long> {
 
     Boolean existsByUserId(Long userId);
 
-    @Query("select new com.wefood.back.farm.dto.FarmListResponse(f.id, f.name, i.name) from Farm f inner join FarmImage fi on fi.pk.farmId=f.id inner join Image i on i.id=fi.pk.imageId where fi.isThumbnail=true")
+    @Query("select new com.wefood.back.farm.dto.FarmListResponse(f.id, f.name, i.name) from Farm f inner join FarmImage fi on fi.pk.farmId=f.id inner join Image i on i.id=fi.pk.imageId where fi.sequence=1")
     Page<FarmListResponse> findFarms(Pageable pageable);
 
     FarmResponse findFarmById(Long id);
