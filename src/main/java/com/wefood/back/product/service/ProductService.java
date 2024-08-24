@@ -10,6 +10,7 @@ import com.wefood.back.product.dto.ProductDetailResponse;
 import com.wefood.back.global.image.dto.ImageDetailResponse;
 import com.wefood.back.product.dto.ProductResponse;
 import com.wefood.back.product.entity.Category;
+import com.wefood.back.product.entity.Item;
 import com.wefood.back.product.entity.Product;
 import com.wefood.back.product.entity.ProductCategory;
 import com.wefood.back.product.entity.ProductTag;
@@ -17,6 +18,7 @@ import com.wefood.back.product.entity.Tag;
 import com.wefood.back.product.exception.CategoryNotFoundException;
 import com.wefood.back.product.exception.ProductNotFoundException;
 import com.wefood.back.product.repository.CategoryRepository;
+import com.wefood.back.product.repository.ItemRepository;
 import com.wefood.back.product.repository.ProductCategoryRepository;
 import com.wefood.back.product.repository.ProductRepository;
 import com.wefood.back.product.repository.ProductTagRepository;
@@ -52,12 +54,14 @@ public class ProductService {
     private final ProductCategoryRepository productCategoryRepository;
     private final FarmRepository farmRepository;
 
+    private final ItemRepository itemRepository;
+
     private final TagRepository tagRepository;
 
     public ProductService(ProductRepository productRepository,
         ProductTagRepository productTagRepository, ProductImageRepository productImageRepository, CategoryRepository categoryRepository, FarmImageRepository farmImageRepository,
         ProductCategoryRepository productCategoryRepository, FarmRepository farmRepository,
-        TagRepository tagRepository) {
+        ItemRepository itemRepository, TagRepository tagRepository) {
         this.productRepository = productRepository;
         this.productTagRepository = productTagRepository;
         this.productImageRepository = productImageRepository;
@@ -65,6 +69,7 @@ public class ProductService {
         this.farmImageRepository = farmImageRepository;
         this.productCategoryRepository = productCategoryRepository;
         this.farmRepository = farmRepository;
+        this.itemRepository = itemRepository;
         this.tagRepository = tagRepository;
     }
 
@@ -156,8 +161,9 @@ public class ProductService {
     public Long create(Long farmId, CreateProductRequest createProductRequest) {
         Farm farm = farmRepository.findById(farmId).orElseThrow(()->new IllegalArgumentException(farmId+"의 농가는 존재하지않습니다"));
         Category category = categoryRepository.findById(createProductRequest.getCategoryId()).orElseThrow(()->new IllegalArgumentException(createProductRequest.getCategoryId()+"의 카테고리는 존재하지않습니다"));
+        Item item = itemRepository.findByName("해당 없음").orElseThrow(()->new IllegalArgumentException("예상치못한 에러값이 들어왔습니다"));
         Product product = productRepository.save(Product.builder().name("["+farm.getName()+"] "+createProductRequest.getName()).price(createProductRequest.getPrice()).detail(
-            createProductRequest.getDetail()).isStatus(true).farm(farm).build());
+            createProductRequest.getDetail()).isStatus(true).farm(farm).item(item).build());
         productCategoryRepository.save(ProductCategory.builder().pk(ProductCategory.Pk.builder().productId(
                 product.getId()).categoryId(
                 category.getId())
