@@ -3,6 +3,8 @@ package com.wefood.back.global.image.service;
 import com.wefood.back.global.image.dto.UploadImageRequestDto;
 import com.wefood.back.global.image.dto.UploadThumbnailRequestDto;
 import java.io.IOException;
+import java.util.List;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * class: StorageService.
@@ -14,7 +16,7 @@ import java.io.IOException;
  * @version 2024/08/11
  */
 public interface StorageService {
-    void saveImages(UploadImageRequestDto uploadImageRequestDto, String dirName) throws IOException;
+    void saveImages(Long id, List<MultipartFile> multipartFiles, String dirName) throws IOException;
 
     void saveThumbnail(UploadThumbnailRequestDto uploadThumbnail, String dirName) throws IOException;
 }
