@@ -19,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -45,33 +46,29 @@ public class FarmController {
     private final static String DIR_NAME = "farm";
 
     @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public void uploadImages(
-            @Valid @ModelAttribute UploadImageRequestDto requestDto,
-            BindingResult result) {
-        if (result.hasErrors()) {
-            throw new InvalidRequestException(result);
-        }
+        @RequestParam("id") Long id,
+        @RequestParam("files") List<MultipartFile> files) {
 
         try {
-            storageService.saveImages(requestDto, DIR_NAME);
+            storageService.saveImages(id,files, DIR_NAME);
         } catch (IOException e) {
             throw new FileUploadException("An error occurred while uploading files.", e);
         }
     }
-
-    @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping("/upload-part")
-    public void uploadImages(
-            @RequestPart("files") MultipartFile[] files, @RequestParam("id") Long id) {
-
-        UploadImageRequestDto uploadImageRequestDto = new UploadImageRequestDto(Arrays.stream(files).toList(), id);
-        try {
-            storageService.saveImages(uploadImageRequestDto, DIR_NAME);
-        } catch (IOException e) {
-            throw new FileUploadException("An error occurred while uploading files.", e);
-        }
-    }
+//    @ResponseStatus(HttpStatus.CREATED)
+//    @PostMapping("/upload-part")
+//    public void uploadImages(
+//            @RequestPart("files") MultipartFile[] files, @RequestParam("id") Long id) {
+//
+//        UploadImageRequestDto uploadImageRequestDto = new UploadImageRequestDto(Arrays.stream(files).toList(), id);
+//        try {
+//            storageService.saveImages(uploadImageRequestDto, DIR_NAME);
+//        } catch (IOException e) {
+//            throw new FileUploadException("An error occurred while uploading files.", e);
+//        }
+//    }
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/thumbnail")

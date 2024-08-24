@@ -58,19 +58,11 @@ public class S3Service implements StorageService {
     @Value("${cloud.aws.s3.bucketName}")
     private String bucket;
 
-    /**
-     *
-     * @param uploadImageRequestDto
-     * @param dirName
-     * @return
-     * @throws IOException
-     */
+
     @Override
-    public void saveImages(UploadImageRequestDto uploadImageRequestDto, String dirName) throws IOException {
-        List<MultipartFile> multipartFiles = uploadImageRequestDto.getFiles();
-        Long id = uploadImageRequestDto.getId();
+    public void saveImages(Long id, List<MultipartFile> multipartFiles, String dirName) throws IOException {
         List<Image> images = new ArrayList<>();
-        ImageRootType rootType= dbCheckRootType(dirName, uploadImageRequestDto.getId());
+        ImageRootType rootType= dbCheckRootType(dirName, id);
         for (MultipartFile multipartFile : multipartFiles) {
             File uploadFile = convert(multipartFile)  // 파일 변환할 수 없으면 에러
                 .orElseThrow(() -> new IllegalArgumentException("error: MultipartFile -> File convert fail"));

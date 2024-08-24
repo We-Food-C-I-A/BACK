@@ -13,12 +13,14 @@ import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.List;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/product")
@@ -89,16 +91,13 @@ public class ProductController {
     }
 
     @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public void uploadImages(
-        @Valid @ModelAttribute UploadImageRequestDto requestDto,
-        BindingResult result) {
+        @RequestParam("id") Long id,
+        @RequestParam("files") List<MultipartFile> files) {
 
-        if (result.hasErrors()) {
-            throw new InvalidRequestException(result);
-        }
         try {
-            storageService.saveImages(requestDto, DIR_NAME);
+            storageService.saveImages(id,files, DIR_NAME);
         } catch (IOException e) {
             throw new FileUploadException("An error occurred while uploading files.", e);
         }
