@@ -153,10 +153,10 @@ public class ProductService {
         return products;
     }
 
-    public void create(Long farmId, CreateProductRequest createProductRequest) {
+    public Long create(Long farmId, CreateProductRequest createProductRequest) {
         Farm farm = farmRepository.findById(farmId).orElseThrow(()->new IllegalArgumentException(farmId+"의 농가는 존재하지않습니다"));
         Category category = categoryRepository.findById(createProductRequest.getCategoryId()).orElseThrow(()->new IllegalArgumentException(createProductRequest.getCategoryId()+"의 카테고리는 존재하지않습니다"));
-        Product product = productRepository.save(Product.builder().name(createProductRequest.getName()).price(createProductRequest.getPrice()).detail(
+        Product product = productRepository.save(Product.builder().name("["+farm.getName()+"] "+createProductRequest.getName()).price(createProductRequest.getPrice()).detail(
             createProductRequest.getDetail()).isStatus(true).farm(farm).build());
         productCategoryRepository.save(ProductCategory.builder().pk(ProductCategory.Pk.builder().productId(
                 product.getId()).categoryId(
@@ -177,5 +177,6 @@ public class ProductService {
             .collect(Collectors.toList());
 
         productTagRepository.saveAll(productTags);
+        return product.getId();
     }
 }

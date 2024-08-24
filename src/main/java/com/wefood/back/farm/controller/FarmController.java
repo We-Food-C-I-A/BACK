@@ -128,12 +128,12 @@ public class FarmController {
 
     @PostMapping("/{farmId}/product")
     @ResponseStatus(HttpStatus.CREATED)
-    public void setProduct(@PathVariable(name = "farmId") Long farmId,
+    public Long setProduct(@PathVariable(name = "farmId") Long farmId,
         @Valid @RequestBody CreateProductRequest createProductRequest,
         BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             throw new InvalidRequestException(bindingResult);
         }
-        productService.create(farmId, createProductRequest);
+        return productService.create(farmId, createProductRequest);
     }
 }
