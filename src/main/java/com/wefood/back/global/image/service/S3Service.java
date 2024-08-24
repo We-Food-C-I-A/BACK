@@ -78,9 +78,12 @@ public class S3Service implements StorageService {
     public void saveThumbnail(Long id, MultipartFile multipartFile, String dirName)
         throws IOException {
         ImageRootType rootType= dbCheckRootType(dirName, id);
+        System.out.println("drcheck exit");
             File uploadFile = convert(multipartFile)  // 파일 변환할 수 없으면 에러
                 .orElseThrow(() -> new IllegalArgumentException("error: MultipartFile -> File convert fail"));
+        System.out.println("convert exit");
         String imageUrl = upload(uploadFile, dirName, id);
+        System.out.println("upload ad exit");
         String extension = getFileExtension(imageUrl);
         System.out.println(imageUrl+" "+extension);
         Image image = Image.builder().name(imageUrl).extension(extension).build();
