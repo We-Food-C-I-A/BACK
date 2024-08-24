@@ -105,12 +105,11 @@ public class ProductController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/thumbnail")
-    public void uploadThumbnail(
-        @Valid @ModelAttribute UploadThumbnailRequestDto requestDto,
-        BindingResult result) {
-        if (result.hasErrors()) {
-            throw new InvalidRequestException(result);
-        }
+    public void uploadThumbnail(@RequestParam("id") Long id,
+        @RequestParam("files") MultipartFile files) {
+        UploadThumbnailRequestDto requestDto = new UploadThumbnailRequestDto();
+        requestDto.setId(id);
+        requestDto.setFiles(files);
 
         try {
             storageService.saveThumbnail(requestDto, DIR_NAME);
